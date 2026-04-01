@@ -179,7 +179,7 @@ export async function buildAlbumFromReleaseGroup(
     label: r['label-info']?.[0]?.label?.name ?? null,
   }))
 
-  const coverArt = null; //await fetchCoverArt(rg.id)
+  const coverArt = await fetchCoverArt(rg.id)
 
   return {
     id: rg.id,
