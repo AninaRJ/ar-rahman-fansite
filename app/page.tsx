@@ -21,7 +21,7 @@ export default async function HomePage() {
   const [homeCms, aboutCms, albums] = await Promise.all([
     sanityClient.fetch<HomePageContent>(HOME_PAGE_QUERY),
     sanityClient.fetch<AboutContent>(ABOUT_QUERY),
-    fetchARRahmanReleaseGroupSummaries(100),
+    fetchARRahmanReleaseGroupSummaries(50),
   ])
 
   // ── CMS fallbacks if Sanity not yet populated ──────────────
