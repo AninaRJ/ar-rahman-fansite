@@ -97,7 +97,7 @@ export default async function HomePage() {
 
           {/* Stats */}
           <div className="animate-fade-up delay-300 flex justify-center gap-0 mt-14 divide-x"
-            style={{ divideColor: 'rgba(200,146,42,0.2)' }}
+            style={{ '--divide-color': 'rgba(200,146,42,0.2)' } as React.CSSProperties}
           >
             {[
               { num: '200+', label: 'Albums' },

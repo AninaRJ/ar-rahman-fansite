@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { sanityClient, PERFORMANCES_QUERY } from '@/lib/sanity'
 import { PerformanceCard } from '@/components/performances/PerformanceCard'
-import type { Performance, PerformanceType } from '@/types'
+import type { Performance } from '@/types'
 
 export const revalidate = 3600
 
@@ -10,9 +10,9 @@ export const metadata: Metadata = {
   description: 'A complete listing of A.R. Rahman\'s live performances, concerts, and special appearances — with YouTube links.',
 }
 
-const PERFORMANCE_TYPES: Array<PerformanceType | 'All'> = [
+/*const PERFORMANCE_TYPES: Array<PerformanceType | 'All'> = [
   'All', 'Concert', 'Award Show', 'TV Performance', 'Film Event', 'Festival', 'Special',
-]
+]*/
 
 export default async function PerformancesPage() {
   const performances = await sanityClient.fetch<Performance[]>(PERFORMANCES_QUERY)
