@@ -195,6 +195,30 @@ export async function buildAlbumFromReleaseGroup(
   }
 }
 
+/**
+ * Fast summary discography (no heavy release-track expansion)
+ * Used for initial page rendering to avoid long MusicBrainz traversal.
+ */
+export async function fetchARRahmanReleaseGroupSummaries(
+  limit = 50,
+  offset = 0
+): Promise<Album[]> {
+  const groups = await fetchARRahmanReleaseGroups(limit, offset)
+
+  return groups.map((rg) => ({
+    id: rg.id,
+    mbid: rg.id,
+    title: rg.title,
+    year: Number(rg['first-release-date']?.slice(0, 4) ?? 0),
+    language: 'International',
+    label: null,
+    coverArt: null,
+    role: 'Composer',
+    songs: [],
+    otherReleases: [],
+  }))
+}
+
 function buildYoutubeMusicSearchUrl(track: string, album: string) {
   const q = encodeURIComponent(`${track} ${album} AR Rahman`)
   return `https://music.youtube.com/search?q=${q}`
@@ -217,6 +241,43 @@ export async function fetchDiscography(): Promise<Album[]> {
   for (const rg of groups) {
     const album = await buildAlbumFromReleaseGroup(rg)
     if (album) albums.push(album)
+  }
+
+  return albums.sort((a, b) => b.year - a.year)
+}
+
+/**
+ * Fetch a higher-level discography with track previews for first N albums.
+ * Keeps page load within Reasonable Time (limit default to 20) while still
+ * showing track names on the main UI.
+ */
+export async function fetchDiscographyWithTrackPreviews(
+  limit = 20,
+  offset = 0
+): Promise<Album[]> {
+  const groups = await fetchARRahmanReleaseGroups(limit, offset)
+
+  const albums: Album[] = []
+
+  for (const rg of groups) {
+    const album = await buildAlbumFromReleaseGroup(rg)
+    if (album) {
+      albums.push(album)
+    } else {
+      // fallback to summary-style album (no tracks) if detail fetch fails
+      albums.push({
+        id: rg.id,
+        mbid: rg.id,
+        title: rg.title,
+        year: Number(rg['first-release-date']?.slice(0, 4) ?? 0),
+        language: 'International',
+        label: null,
+        coverArt: null,
+        role: 'Composer',
+        songs: [],
+        otherReleases: [],
+      })
+    }
   }
 
   return albums.sort((a, b) => b.year - a.year)

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { sanityClient, HOME_PAGE_QUERY, ABOUT_QUERY } from '@/lib/sanity'
-import { fetchDiscography } from '@/lib/musicbrainz'
+import { fetchDiscographyWithTrackPreviews } from '@/lib/musicbrainz'
 import { enrichAlbumsWithSpotify } from '@/lib/spotify'
 import { AlbumGrid } from '@/components/albums/AlbumGrid'
 import { Badge } from '@/components/ui/Badge'
@@ -17,11 +17,11 @@ export const metadata: Metadata = {
 }
 
 export default async function HomePage() {
-  // Fetch CMS content and discography in parallel
+  // Fetch CMS content and track-preview discography in parallel
   const [homeCms, aboutCms, rawAlbums] = await Promise.all([
     sanityClient.fetch<HomePageContent>(HOME_PAGE_QUERY),
     sanityClient.fetch<AboutContent>(ABOUT_QUERY),
-    fetchDiscography(),
+    fetchDiscographyWithTrackPreviews(20),
   ])
 
   // Enrich with Spotify data (cover art + streaming links)
