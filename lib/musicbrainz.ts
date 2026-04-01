@@ -200,7 +200,7 @@ export async function buildAlbumFromReleaseGroup(
  * Used for initial page rendering to avoid long MusicBrainz traversal.
  */
 export async function fetchARRahmanReleaseGroupSummaries(
-  limit = 50,
+  limit = 100,
   offset = 0
 ): Promise<Album[]> {
   const groups = await fetchARRahmanReleaseGroups(limit, offset)
