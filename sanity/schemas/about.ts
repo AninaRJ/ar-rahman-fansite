@@ -4,7 +4,6 @@ export const about = defineType({
   name: 'about',
   title: 'About A.R. Rahman',
   type: 'document',
-  __experimental_actions: ['update', 'publish'],
   fields: [
     defineField({
       name: 'shortBio',
