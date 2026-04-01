@@ -77,9 +77,10 @@ export function AlbumCard({ album }: AlbumCardProps) {
                 <p className="text-xs text-[var(--gold-light)]">+{album.songs.length - 3} more</p>
               )}
             </div>
-          ) : (
-            <p className="text-xs text-muted mb-3">Track details not available</p>
-          )}
+            ) : null}
+            <div className="text-xs text-muted mb-3">
+              {album.songs.length} track{album.songs.length !== 1 ? 's' : ''}
+            </div>
 
           <div className="flex flex-wrap gap-1.5">
             <Badge variant="lang">{album.language}</Badge>
