@@ -21,7 +21,7 @@ export default async function HomePage() {
   const [homeCms, aboutCms, rawAlbums] = await Promise.all([
     sanityClient.fetch<HomePageContent>(HOME_PAGE_QUERY),
     sanityClient.fetch<AboutContent>(ABOUT_QUERY),
-    fetchDiscographyWithTrackPreviews(20),
+    fetchDiscographyWithTrackPreviews(50),
   ])
 
   // Enrich with Spotify data (cover art + streaming links)

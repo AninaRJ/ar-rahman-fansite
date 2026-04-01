@@ -179,7 +179,7 @@ export async function buildAlbumFromReleaseGroup(
     label: r['label-info']?.[0]?.label?.name ?? null,
   }))
 
-  const coverArt = await fetchCoverArt(rg.id)
+  const coverArt = null; //await fetchCoverArt(rg.id)
 
   return {
     id: rg.id,
@@ -252,7 +252,7 @@ export async function fetchDiscography(): Promise<Album[]> {
  * showing track names on the main UI.
  */
 export async function fetchDiscographyWithTrackPreviews(
-  limit = 20,
+  limit = 50,
   offset = 0
 ): Promise<Album[]> {
   const groups = await fetchARRahmanReleaseGroups(limit, offset)
