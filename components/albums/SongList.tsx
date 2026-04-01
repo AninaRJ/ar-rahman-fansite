@@ -58,14 +58,14 @@ export function SongList({ songs }: SongListProps) {
                     borderColor: platform.border,
                     background: 'transparent',
                   }}
-                  onMouseEnter={(e) => {
-                    ;(e.currentTarget as HTMLAnchorElement).style.background =
-                      platform.bg
-                  }}
-                  onMouseLeave={(e) => {
-                    ;(e.currentTarget as HTMLAnchorElement).style.background =
-                      'transparent'
-                  }}
+                  // onMouseEnter={(e) => {
+                  //   ;(e.currentTarget as HTMLAnchorElement).style.background =
+                  //     platform.bg
+                  // }}
+                  // onMouseLeave={(e) => {
+                  //   ;(e.currentTarget as HTMLAnchorElement).style.background =
+                  //     'transparent'
+                  // }}
                 >
                   {platform.short}
                 </a>
