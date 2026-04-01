@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { sanityClient, HOME_PAGE_QUERY, ABOUT_QUERY } from '@/lib/sanity'
-import { fetchDiscographyWithTrackPreviews } from '@/lib/musicbrainz'
-import { enrichAlbumsWithSpotify } from '@/lib/spotify'
+import { fetchARRahmanReleaseGroupSummaries } from '@/lib/musicbrainz'
+// import { enrichAlbumsWithSpotify } from '@/lib/spotify'
 import { AlbumGrid } from '@/components/albums/AlbumGrid'
 import { Badge } from '@/components/ui/Badge'
 import type { HomePageContent, AboutContent } from '@/types'
@@ -17,15 +17,12 @@ export const metadata: Metadata = {
 }
 
 export default async function HomePage() {
-  // Fetch CMS content and track-preview discography in parallel
-  const [homeCms, aboutCms, rawAlbums] = await Promise.all([
+  // Fetch CMS content and fast album summaries in parallel
+  const [homeCms, aboutCms, albums] = await Promise.all([
     sanityClient.fetch<HomePageContent>(HOME_PAGE_QUERY),
     sanityClient.fetch<AboutContent>(ABOUT_QUERY),
-    fetchDiscographyWithTrackPreviews(50),
+    fetchARRahmanReleaseGroupSummaries(50),
   ])
-
-  // Enrich with Spotify data (cover art + streaming links)
-  const albums = await enrichAlbumsWithSpotify(rawAlbums)
 
   // ── CMS fallbacks if Sanity not yet populated ──────────────
   const heading = homeCms?.welcomeHeading ?? 'The Sound of A.R. Rahman'
