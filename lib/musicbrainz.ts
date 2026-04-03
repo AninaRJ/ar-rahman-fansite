@@ -226,11 +226,12 @@ export async function fetchARRahmanReleaseGroupSummaries(
     try {
       coverArt = await fetchCoverArt(rg.id)
     } catch (e) {
+      console.warn(`Failed to fetch cover art for ${rg.id}:`, e)
       coverArt = null
     }
 
-    // Fetch releases to get track count
-    let trackCount = 0
+    // Fetch releases to get track list
+    let songs: Song[] = []
     try {
       const rgDetails = await fetchReleaseGroupWithReleases(rg.id)
       if (rgDetails && rgDetails.releases && rgDetails.releases.length > 0) {
@@ -239,11 +240,22 @@ export async function fetchARRahmanReleaseGroupSummaries(
         const primary = sorted[0]
         const fullRelease = primary ? await fetchReleaseWithTracks(primary.id) : null
         if (fullRelease && fullRelease.media) {
-          trackCount = fullRelease.media.reduce((acc, m) => acc + (m.tracks?.length || 0), 0)
+          const tracks = fullRelease.media.flatMap((m) => m.tracks)
+          songs = tracks.map((t, i) => ({
+            title: t.title,
+            duration: formatDuration(t.length),
+            trackNumber: i + 1,
+            streaming: {
+              spotify: null,
+              youtubeMusic: buildYoutubeMusicSearchUrl(t.title, rg.title),
+              appleMusic: buildAppleMusicSearchUrl(t.title),
+            },
+          }))
         }
       }
     } catch (e) {
-      trackCount = 0
+      console.warn(`Failed to fetch tracks for ${rg.id}:`, e)
+      songs = []
     }
 
     return {
@@ -255,7 +267,7 @@ export async function fetchARRahmanReleaseGroupSummaries(
       label: null,
       coverArt,
       role: 'Composer',
-      songs: Array(trackCount).fill({}), // Only for length
+      songs,
       otherReleases: [],
     }
   }))
