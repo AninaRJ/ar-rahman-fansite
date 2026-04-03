@@ -17,11 +17,11 @@ export const metadata: Metadata = {
 }
 
 export default async function HomePage() {
-  // Fetch CMS content and fast album summaries in parallel
+  // Fetch CMS content and all cached albums in parallel
   const [homeCms, aboutCms, albums] = await Promise.all([
     sanityClient.fetch<HomePageContent>(HOME_PAGE_QUERY),
     sanityClient.fetch<AboutContent>(ABOUT_QUERY),
-    fetchARRahmanReleaseGroupSummaries(30),
+    fetchARRahmanReleaseGroupSummaries(1000), // Large number to get all cached albums
   ])
 
   // ── CMS fallbacks if Sanity not yet populated ──────────────
