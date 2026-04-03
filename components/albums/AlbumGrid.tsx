@@ -1,16 +1,20 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useCallback, useEffect } from 'react'
 import { AlbumCard } from './AlbumCard'
 import { cn, ALBUM_LANGUAGES } from '@/lib/utils'
 import type { Album, AlbumLanguage } from '@/types'
 
 interface AlbumGridProps {
   albums: Album[]
+  batchSize?: number // Optional batch size for infinite scroll
 }
 
 export function AlbumGrid({ albums }: AlbumGridProps) {
   const [activeFilter, setActiveFilter] = useState<AlbumLanguage | 'All'>('All')
+  const [visibleCount, setVisibleCount] = useState(20)
+  const batchSize = 20
+  const loaderRef = useRef<HTMLDivElement | null>(null)
 
   const filtered = useMemo(() => {
     if (activeFilter === 'All') return albums
@@ -21,6 +25,31 @@ export function AlbumGrid({ albums }: AlbumGridProps) {
   const availableFilters = ALBUM_LANGUAGES.filter(
     (lang) => lang === 'All' || albums.some((a) => a.language === lang)
   )
+
+  // Infinite scroll observer
+  const handleObserver = useCallback((entries: IntersectionObserverEntry[]) => {
+    const target = entries[0]
+    if (target.isIntersecting) {
+      setVisibleCount((prev) => Math.min(prev + batchSize, filtered.length))
+    }
+  }, [filtered.length])
+
+  useEffect(() => {
+    setVisibleCount(20) // Reset on filter change
+  }, [activeFilter, albums])
+
+  useEffect(() => {
+    const option = {
+      root: null,
+      rootMargin: '20px',
+      threshold: 1.0,
+    }
+    const observer = new window.IntersectionObserver(handleObserver, option)
+    if (loaderRef.current) observer.observe(loaderRef.current)
+    return () => {
+      if (loaderRef.current) observer.unobserve(loaderRef.current)
+    }
+  }, [handleObserver])
 
   return (
     <div>
@@ -61,11 +90,17 @@ export function AlbumGrid({ albums }: AlbumGridProps) {
           <p className="text-sm">Try a different language filter.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
-          {filtered.map((album) => (
-            <AlbumCard key={album.id} album={album} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
+            {filtered.slice(0, visibleCount).map((album) => (
+              <AlbumCard key={album.id} album={album} />
+            ))}
+          </div>
+          <div ref={loaderRef} style={{ height: 40 }} />
+          {visibleCount < filtered.length && (
+            <div className="text-center py-4 text-xs text-[var(--text-muted)]">Loading more albums…</div>
+          )}
+        </>
       )}
     </div>
   )

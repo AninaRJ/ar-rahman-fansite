@@ -205,17 +205,45 @@ export async function fetchARRahmanReleaseGroupSummaries(
 ): Promise<Album[]> {
   const groups = await fetchARRahmanReleaseGroups(limit, offset)
 
-  return groups.map((rg) => ({
-    id: rg.id,
-    mbid: rg.id,
-    title: rg.title,
-    year: Number(rg['first-release-date']?.slice(0, 4) ?? 0),
-    language: 'International',
-    label: null,
-    coverArt: null,
-    role: 'Composer',
-    songs: [],
-    otherReleases: [],
+  // Fetch cover art and track count for each album in parallel
+  return await Promise.all(groups.map(async (rg) => {
+    // Fetch cover art
+    let coverArt: string | null = null
+    try {
+      coverArt = await fetchCoverArt(rg.id)
+    } catch (e) {
+      coverArt = null
+    }
+
+    // Fetch releases to get track count
+    let trackCount = 0
+    try {
+      const rgDetails = await fetchReleaseGroupWithReleases(rg.id)
+      if (rgDetails && rgDetails.releases && rgDetails.releases.length > 0) {
+        // Sort releases by date ascending to find the original
+        const sorted = [...rgDetails.releases].sort((a, b) => (a.date ?? '').localeCompare(b.date ?? ''))
+        const primary = sorted[0]
+        const fullRelease = primary ? await fetchReleaseWithTracks(primary.id) : null
+        if (fullRelease && fullRelease.media) {
+          trackCount = fullRelease.media.reduce((acc, m) => acc + (m.tracks?.length || 0), 0)
+        }
+      }
+    } catch (e) {
+      trackCount = 0
+    }
+
+    return {
+      id: rg.id,
+      mbid: rg.id,
+      title: rg.title,
+      year: Number(rg['first-release-date']?.slice(0, 4) ?? 0),
+      language: 'International',
+      label: null,
+      coverArt,
+      role: 'Composer',
+      songs: Array(trackCount).fill({}), // Only for length
+      otherReleases: [],
+    }
   }))
 }
 
