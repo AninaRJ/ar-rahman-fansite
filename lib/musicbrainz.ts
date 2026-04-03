@@ -1,3 +1,5 @@
+import fs from 'fs'
+import path from 'path'
 import type {
   Album,
   AlbumRole,
@@ -203,9 +205,21 @@ export async function fetchARRahmanReleaseGroupSummaries(
   limit = 30,
   offset = 0
 ): Promise<Album[]> {
-  const groups = await fetchARRahmanReleaseGroups(limit, offset)
+  // Try to read from cache first
+  try {
+    const cacheFile = path.join(process.cwd(), '.next', 'cache', 'albums.json')
+    if (fs.existsSync(cacheFile)) {
+      const data = fs.readFileSync(cacheFile, 'utf-8')
+      const albums: Album[] = JSON.parse(data)
+      return albums.slice(offset, offset + limit)
+    }
+  } catch (e) {
+    // If cache read fails, fallback to API
+    console.warn('Failed to read album cache, falling back to API:', e)
+  }
 
-  // Fetch cover art and track count for each album in parallel
+  // Fallback: fetch from API (slow, rate-limited)
+  const groups = await fetchARRahmanReleaseGroups(limit, offset)
   return await Promise.all(groups.map(async (rg) => {
     // Fetch cover art
     let coverArt: string | null = null
