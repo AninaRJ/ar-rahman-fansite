@@ -61,26 +61,10 @@ export function AlbumCard({ album }: AlbumCardProps) {
             {album.title}
           </h3>
           <p className="text-xs mb-2" style={{ color: 'var(--text-muted)' }}>
-            {album.label ?? 'Independent'} · {album.songs.length} tracks
+            {album.label ?? 'Independent'}
           </p>
 
-          {album.songs.length > 0 ? (
-            <div className="text-xs text-muted space-y-1 mb-3" style={{ maxHeight: '10rem', overflow: 'hidden' }}>
-              <ul className="list-disc list-inside">
-                {album.songs.slice(0, 3).map((song, idx) => (
-                  <li key={`${album.mbid}-song-${idx}`} className="truncate">
-                    {song.trackNumber}. {song.title} {song.duration ? `(${song.duration})` : ''}
-                  </li>
-                ))}
-              </ul>
-              {album.songs.length > 3 && (
-                <p className="text-xs text-[var(--gold-light)]">+{album.songs.length - 3} more</p>
-              )}
-            </div>
-            ) : null}
-            <div className="text-xs text-muted mb-3">
-              {album.songs.length} track{album.songs.length !== 1 ? 's' : ''}
-            </div>
+          {/* Track listing removed for performance; only show on album detail page */}
 
           <div className="flex flex-wrap gap-1.5">
             <Badge variant="lang">{album.language}</Badge>
