@@ -27,12 +27,15 @@
 /* ── Base ───────────────────────────────────────────────── */
 html {
   scroll-behavior: smooth;
+  /* Prevent horizontal scroll on mobile */
+  overflow-x: hidden;
 }
 
 body {
   color: var(--text);
   background: radial-gradient(circle at top, #1b2b4f 0%, #040813 42%, #02030a 100%);
   min-height: 100vh;
+  font-size: 16px;
 }
 
 ::selection {
@@ -161,3 +164,64 @@ body {
 .badge-film   { background: rgba(98, 232, 255, 0.12); color: #80DFFF; }
 .badge-music  { background: rgba(197, 108, 255, 0.14); color: #E3B9FF; }
 .badge-live   { background: rgba(104, 220, 164, 0.12); color: #A0F7D4; }
+
+/* Responsive base font size */
+body {
+  font-size: 16px;
+}
+@media (max-width: 768px) {
+  body {
+    font-size: 15px;
+  }
+}
+@media (max-width: 480px) {
+  body {
+    font-size: 14px;
+    padding: 0;
+  }
+}
+
+/* Responsive headings */
+h1, .text-4xl, .font-display.text-4xl {
+  font-size: clamp(2rem, 6vw, 2.5rem);
+}
+h2, .text-3xl, .font-display.text-3xl {
+  font-size: clamp(1.5rem, 5vw, 2rem);
+}
+h3, .text-2xl, .font-display.text-2xl {
+  font-size: clamp(1.25rem, 4vw, 1.5rem);
+}
+h4, .text-xl, .font-display.text-xl {
+  font-size: clamp(1.1rem, 3vw, 1.25rem);
+}
+@media (max-width: 480px) {
+  h1, .text-4xl, .font-display.text-4xl {
+    font-size: 1.6rem;
+  }
+  h2, .text-3xl, .font-display.text-3xl {
+    font-size: 1.25rem;
+  }
+  h3, .text-2xl, .font-display.text-2xl {
+    font-size: 1.1rem;
+  }
+  h4, .text-xl, .font-display.text-xl {
+    font-size: 1rem;
+  }
+}
+
+/* Responsive grid helpers */
+.responsive-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+@media (min-width: 640px) {
+  .responsive-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (min-width: 1024px) {
+  .responsive-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
