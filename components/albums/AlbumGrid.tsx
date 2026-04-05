@@ -5,21 +5,33 @@ import { AlbumCard } from './AlbumCard'
 import { cn, ALBUM_LANGUAGES } from '@/lib/utils'
 import type { Album, AlbumLanguage } from '@/types'
 
+
 interface AlbumGridProps {
-  albums: Album[]
-  batchSize?: number // Optional batch size for infinite scroll
+  albums: Album[];
+  batchSize?: number; // Optional batch size for infinite scroll
+  searchQuery?: string;
 }
 
-export function AlbumGrid({ albums }: AlbumGridProps) {
-  const [activeFilter, setActiveFilter] = useState<AlbumLanguage | 'All'>('All')
-  const [visibleCount, setVisibleCount] = useState(20)
-  const batchSize = 20
-  const loaderRef = useRef<HTMLDivElement | null>(null)
+export function AlbumGrid({ albums, batchSize = 20, searchQuery = '' }: AlbumGridProps) {
+  const [activeFilter, setActiveFilter] = useState<AlbumLanguage | 'All'>('All');
+  const [visibleCount, setVisibleCount] = useState(batchSize);
+  const loaderRef = useRef<HTMLDivElement | null>(null);
+  const normalizedSearch = searchQuery.toLowerCase();
 
   const filtered = useMemo(() => {
-    if (activeFilter === 'All') return albums
-    return albums.filter((a) => a.language === activeFilter)
-  }, [albums, activeFilter])
+    let result = albums;
+    if (activeFilter !== 'All') {
+      result = result.filter((a) => a.language === activeFilter);
+    }
+    if (normalizedSearch) {
+      result = result.filter(
+        (a) =>
+          a.title.toLowerCase().includes(normalizedSearch) ||
+          a.language.toLowerCase().includes(normalizedSearch)
+      );
+    }
+    return result;
+  }, [albums, activeFilter, normalizedSearch]);
 
   // Only show language filters that have albums
   const availableFilters = ALBUM_LANGUAGES.filter(

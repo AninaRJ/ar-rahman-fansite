@@ -2,10 +2,10 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import { sanityClient, HOME_PAGE_QUERY, ABOUT_QUERY } from '@/lib/sanity'
 import { fetchARRahmanReleaseGroupSummaries } from '@/lib/musicbrainz'
-// import { enrichAlbumsWithSpotify } from '@/lib/spotify'
-import { AlbumGrid } from '@/components/albums/AlbumGrid'
 import { Badge } from '@/components/ui/Badge'
 import type { HomePageContent, AboutContent } from '@/types'
+
+import AlbumGridWithSearchWrapper from '@/components/albums/AlbumGridWithSearchWrapper'
 
 // ISR: revalidate every hour
 export const revalidate = 3600
@@ -39,6 +39,8 @@ export default async function HomePage() {
     'Composer', 'Singer', 'Producer', 'Pianist',
     'Tamil', 'Hindi', 'World Music',
   ]
+
+
 
   return (
     <div>
@@ -196,7 +198,7 @@ export default async function HomePage() {
           </div>
         </div>
 
-        <AlbumGrid albums={albums} />
+        <AlbumGridWithSearchWrapper albums={albums} />
       </section>
     </div>
   )
