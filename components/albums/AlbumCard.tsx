@@ -15,18 +15,19 @@ export function AlbumCard({ album }: AlbumCardProps) {
   return (
     <Link href={`/albums/${album.mbid}--${slug}`}>
       <article
-        className="card-lift rounded-xl overflow-hidden border cursor-pointer"
-        style={{ borderColor: 'var(--gold-border)', background: 'var(--surface)' }}
+        className="card-lift rounded-xl overflow-hidden cursor-pointer"
+        style={{ background: 'var(--surface)' }}
       >
         {/* Cover art */}
-        <div className="relative h-44 overflow-hidden">
+        <div className="relative aspect-square w-full h-full min-h-[180px] overflow-hidden">
           {album.coverArt ? (
             <Image
               src={album.coverArt}
               alt={`${album.title} cover art`}
               fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-              className="object-cover"
+              sizes="100vw"
+              className="object-cover w-full h-full"
+              priority
             />
           ) : (
             <div
