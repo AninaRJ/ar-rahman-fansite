@@ -47,7 +47,6 @@ function mapLanguage(code: string | undefined): string {
     tel: 'Telugu',
     mal: 'Malayalam',
     kan: 'Kannada',
-    eng: 'International',
     mul: 'Multi-language',
   }
   return map[code?.toLowerCase() ?? ''] ?? 'Other'
@@ -149,6 +148,7 @@ export async function buildAlbumFromReleaseGroup(
   rg: MusicBrainzReleaseGroup
 ): Promise<Album | null> {
   const rgDetails = await fetchReleaseGroupWithReleases(rg.id)
+  
   if (!rgDetails || !rgDetails.releases || rgDetails.releases.length === 0) return null
 
   // Sort releases by date ascending to find the original
@@ -156,6 +156,7 @@ export async function buildAlbumFromReleaseGroup(
     (a.date ?? '').localeCompare(b.date ?? '')
   )
   const primary = sorted[0]
+  const language = mapLanguage(primary?.['text-representation']?.language)
 
   // Fetch full release data for track listing
   const fullRelease = await fetchReleaseWithTracks(primary.id)
@@ -176,7 +177,7 @@ export async function buildAlbumFromReleaseGroup(
 
   // Other releases = alternate language/year editions
   const otherReleases: AlbumRelease[] = sorted.slice(1).map((r) => ({
-    language: mapLanguage(r['text-representation']?.language),
+    language,
     year: parseInt(r.date?.slice(0, 4) ?? '0'),
     label: r['label-info']?.[0]?.label?.name ?? null,
   }))
@@ -188,7 +189,7 @@ export async function buildAlbumFromReleaseGroup(
     mbid: rg.id,
     title: rg.title,
     year: parseInt(rg['first-release-date']?.slice(0, 4) ?? '0'),
-    language: mapLanguage(fullRelease['text-representation']?.language),
+    language,
     label: fullRelease['label-info']?.[0]?.label?.name ?? null,
     coverArt,
     role: inferRole(fullRelease),
@@ -220,6 +221,7 @@ export async function fetchARRahmanReleaseGroupSummaries(
 
   // Fallback: fetch from API (slow, rate-limited)
   const groups = await fetchARRahmanReleaseGroups(limit, offset)
+  
   return await Promise.all(groups.map(async (rg) => {
     // Fetch cover art
     let coverArt: string | null = null
@@ -232,12 +234,29 @@ export async function fetchARRahmanReleaseGroupSummaries(
 
     // Fetch releases to get track list
     let songs: Song[] = []
-    try {
+    let language = ''
+    const summary: Album = {
+            id: rg.id,
+            mbid: rg.id,
+            title: rg.title,
+            year: Number(rg['first-release-date']?.slice(0, 4) ?? 0),
+            language: language,
+            label: null,
+            coverArt,
+            role: 'Composer',
+            songs,
+            otherReleases: [],
+          }
+      try {
+      await delay(3600) // Add delay to avoid rate limit
       const rgDetails = await fetchReleaseGroupWithReleases(rg.id)
+
       if (rgDetails && rgDetails.releases && rgDetails.releases.length > 0) {
         // Sort releases by date ascending to find the original
         const sorted = [...rgDetails.releases].sort((a, b) => (a.date ?? '').localeCompare(b.date ?? ''))
         const primary = sorted[0]
+        language = mapLanguage(primary?.['text-representation']?.language)
+
         const fullRelease = primary ? await fetchReleaseWithTracks(primary.id) : null
         if (fullRelease && fullRelease.media) {
           const tracks = fullRelease.media.flatMap((m) => m.tracks)
@@ -252,24 +271,16 @@ export async function fetchARRahmanReleaseGroupSummaries(
             },
           }))
         }
+
+        summary.label = fullRelease?.['label-info']?.[0]?.label?.name ?? null  
+        summary.language = language
       }
     } catch (e) {
       console.warn(`Failed to fetch tracks for ${rg.id}:`, e)
       songs = []
     }
 
-    return {
-      id: rg.id,
-      mbid: rg.id,
-      title: rg.title,
-      year: Number(rg['first-release-date']?.slice(0, 4) ?? 0),
-      language: 'International',
-      label: null,
-      coverArt,
-      role: 'Composer',
-      songs,
-      otherReleases: [],
-    }
+    return summary;
   }))
 }
 
@@ -293,6 +304,7 @@ export async function fetchDiscography(): Promise<Album[]> {
   const albums: Album[] = []
 
   for (const rg of groups) {
+    await delay(1200) // Add delay to avoid rate limit
     const album = await buildAlbumFromReleaseGroup(rg)
     if (album) albums.push(album)
   }
@@ -315,6 +327,7 @@ export async function fetchDiscographyWithTrackPreviews(
 
   for (const rg of groups) {
     const album = await buildAlbumFromReleaseGroup(rg)
+
     if (album) {
       albums.push(album)
     } else {
@@ -324,7 +337,7 @@ export async function fetchDiscographyWithTrackPreviews(
         mbid: rg.id,
         title: rg.title,
         year: Number(rg['first-release-date']?.slice(0, 4) ?? 0),
-        language: 'International',
+        language: mapLanguage(rg['text-representation']?.language),
         label: null,
         coverArt: null,
         role: 'Composer',

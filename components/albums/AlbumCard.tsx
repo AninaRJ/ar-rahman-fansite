@@ -68,7 +68,7 @@ export function AlbumCard({ album }: AlbumCardProps) {
           {/* Track listing removed for performance; only show on album detail page */}
 
           <div className="flex flex-wrap gap-1.5">
-            <Badge variant="lang">{album.language}</Badge>
+            {album.language && <Badge variant="lang">{album.language}</Badge>}
             <Badge variant="role">{album.role}</Badge>
             {album.otherReleases.length > 0 && (
               <Badge variant="gold">+{album.otherReleases.length} lang</Badge>

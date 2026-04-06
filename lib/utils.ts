@@ -35,6 +35,7 @@ export const LANGUAGE_GRADIENTS: Record<string, string> = {
   Malayalam: 'from-blue-900 to-sky-700',
   Kannada: 'from-orange-900 to-amber-700',
   International: 'from-slate-800 to-zinc-600',
+  Multilanguage: 'from-indigo-900 to-blue-700',
   Other: 'from-stone-800 to-stone-600',
 }
 
@@ -56,6 +57,8 @@ export const ALBUM_LANGUAGES: Array<AlbumLanguage | 'All'> = [
   'Malayalam',
   'Kannada',
   'International',
+  'Multilanguage',
+  'Other',
 ]
 
 /** Streaming platform configs */

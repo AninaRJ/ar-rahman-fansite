@@ -36,7 +36,7 @@ export interface Album {
 
 export type AlbumRole = 'Composer' | 'Singer' | 'Composer & Singer' | 'Collaborator' | 'Producer'
 
-export type AlbumLanguage = 'Tamil' | 'Hindi' | 'Telugu' | 'Malayalam' | 'Kannada' | 'International' | 'Other'
+export type AlbumLanguage = 'Tamil' | 'Hindi' | 'Telugu' | 'Malayalam' | 'Kannada' | 'International' | 'Other' | 'Multilanguage'
 
 // ─────────────────────────────────────────
 // PERFORMANCES
@@ -116,7 +116,8 @@ export interface MusicBrainzReleaseGroup {
   id: string
   title: string
   'primary-type': string
-  'first-release-date': string
+  'first-release-date': string,
+  'text-representation': { language: string }
   releases: MusicBrainzRelease[]
 }
 
