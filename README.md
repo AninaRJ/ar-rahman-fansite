@@ -180,6 +180,11 @@ Edit `ALBUM_LANGUAGES` in `lib/utils.ts`.
 ### Customising the design tokens
 All colour/spacing tokens are in `app/globals.css` (CSS variables) and `tailwind.config.ts`.
 
+### Todo
+1. Load all the data into sanity from here that is pertaining to ARR 
+  https://data.metabrainz.org/pub/musicbrainz/data/fullexport/20260401-002235/
+  https://data.metabrainz.org/pub/musicbrainz/data/json-dumps/20260401-001001/
+
 ---
 
 ## License
